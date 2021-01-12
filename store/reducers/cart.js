@@ -2,6 +2,7 @@ import { add } from "react-native-reanimated"
 import CartItem from "../../models/cart-item"
 import { ADD_TO_CART, REMOVE_FROM_CART} from "../actions/cart"
 import { ADD_ORDER } from "../actions/order"
+import { DELETE_PRODUCT } from "../actions/product"
 
 const initialState = {
     items:{},
@@ -54,6 +55,19 @@ export default (state=initialState,action) => {
             }
         case ADD_ORDER:
             return initialState
+        case DELETE_PRODUCT:
+            if (!state.items[action.payload]){
+                return state
+            }
+            const updatedItems = {...state.items}
+            const itemTotal = updatedItems[action.payload].sum
+            delete updatedItems[action.payload]
+
+            return {
+                ...state,
+                items: updatedItems,
+                totalAmount: state.totalAmount- itemTotal
+            }
         default:
             return state
     }
