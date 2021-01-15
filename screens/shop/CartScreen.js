@@ -1,5 +1,5 @@
-import React from 'react'
-import { Button, StyleSheet, Text, View, ViewBase } from 'react-native'
+import React,{useState} from 'react'
+import { Button, StyleSheet,ActivityIndicator, Text, View, ViewBase } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler';
 import {useSelector, useDispatch} from 'react-redux';
 import CartItem from '../../components/shop/CartItem';
@@ -9,6 +9,7 @@ import * as ordersActions from '../../store/actions/order'
 
 
 const CartScreen = (props) => {
+    const [isLoading, setIsLoading] = useState(false)
     const dispatch = useDispatch()
     const cartTotalAmount = useSelector(state=> state.cart.totalAmount)
     const cartItems = useSelector(state=>{
@@ -24,20 +25,25 @@ const CartScreen = (props) => {
         }
         return transformedCartItems
     })
+
+    const sendOrderHandler = async ()=>{
+        setIsLoading(true)
+        dispatch(ordersActions.addOrder(cartItems,cartTotalAmount))
+        setIsLoading(false)
+    }
+
     return (
         <View style={styles.screen}>
             <Card  style={styles.summary}>
                 <Text style={styles.summaryText}>
                     Total: <Text style={styles.summaryAmount}>${cartTotalAmount}</Text>
                 </Text>
-            <Button 
+                {isLoading ? <ActivityIndicator size='small' color='blue'/>:<Button 
                 title='order now' 
                 disabled={cartItems.length===0}
-                onPress={()=>{
-                    dispatch(ordersActions.addOrder(cartItems,cartTotalAmount))
-                }
-                }
-                />
+                onPress={sendOrderHandler}
+                />}
+            
             </Card>
             <FlatList 
                 data={cartItems}

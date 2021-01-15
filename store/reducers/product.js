@@ -1,15 +1,20 @@
 import PRODUCTS from '../../data/dummy_data'
 import Product from '../../models/product'
-import { CREATE_PRODUCT, DELETE_PRODUCT, UPDATE_PRODUCT } from '../actions/product'
+import { CREATE_PRODUCT, DELETE_PRODUCT, SET_PRODUCTS, UPDATE_PRODUCT } from '../actions/product'
 
 
 const initialState = {
-    availableProducts:PRODUCTS,
-    userProducts:PRODUCTS.filter(prod=> prod.ownerId==='u1')
+    availableProducts:[],
+    userProducts:[]
 }
 
 export default (state=initialState,action) => {
     switch(action.type){
+        case SET_PRODUCTS:
+            return {
+                availableProducts:action.products,
+                userProducts: action.userProducts
+            }
         case DELETE_PRODUCT:
             return {
                 ...state,
@@ -18,8 +23,8 @@ export default (state=initialState,action) => {
             }
         case CREATE_PRODUCT:
             const newProduct = new Product(
-                new Date().toString(),
-                'u1',
+                action.payload.id,
+                action.payload.ownerId,
                 action.payload.title,
                 action.payload.imageUrl,
                 action.payload.description,
@@ -33,7 +38,6 @@ export default (state=initialState,action) => {
         case UPDATE_PRODUCT:
             const productIndex = state.userProducts.findIndex(prod=>prod.id===action.productId);
             const availbleProductIndex = state.availableProducts.findIndex(prod=>prod.id===action.productId);
-            console.log(action.payload);
             const updatedProduct = new Product(
                 action.productId,
                 state.userProducts[productIndex].ownerId,
